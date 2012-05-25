@@ -3,6 +3,7 @@ import requests
 import json
 import sys
 import cgi, cgitb
+import copy
 
 def api_input ():
 	# Create instance of FieldStorage 
@@ -60,23 +61,28 @@ def metadatacall (pictures):
 	jpicture_id = {}
 	jpicture_url = {}
 	jhistogram = {}
-	data = []
+	data = {}
 
 	for i in pictures:
-		try:
-			req_param = 'https://api.mercadolibre.com/pictures/'+ i[0] + '/metadata'
-			r = requests.get(req_param)
-			content = json.loads(r.content)
-			jpicture_id['picture_id'] = i[0]
-			jpicture_url['url'] = i[1]
-			jhistogram['histogram'] = content ["histogram"]
-			data = [jpicture_id, jpicture_url,jhistogram]
-
+		req_param = 'https://api.mercadolibre.com/pictures/'+ i[0] + '/metadata'
+		#print req_param
+		r = requests.get(req_param)
+		content = json.loads(r.content)
+		
+		try:	
+			if content['histogram']:
+				data = {}
+				jpicture_id['picture_id'] = i[0]
+				jpicture_url['url'] = i[1]
+				jhistogram['histogram'] = content ["histogram"]
+				data = [jpicture_id, jpicture_url,jhistogram]
+				metadata_list.append(copy.deepcopy(data))
+			
 		except:
 			pass
-
-		metadata_list.append(data)
-		
+			
+	
+	#print metadata_list		
 	return metadata_list
 
 
@@ -102,7 +108,6 @@ else:
 	items_id = searchcall (q)
 	pictures = itemscall (items_id)
 	metadata_list = metadatacall (pictures)
-	print metadata_list
 	JsonBuild (metadata_list)
 
 
