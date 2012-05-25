@@ -57,7 +57,6 @@ def itemscall (item_id):
 
 def metadatacall (pictures):
 	metadata_list = []
-	jitem_id = {}
 	jpicture_id = {}
 	jpicture_url = {}
 	jhistogram = {}
