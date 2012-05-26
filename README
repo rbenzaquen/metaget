@@ -1,0 +1,12 @@
+This is a very simple program to test irecognition API.
+
+You can Test it using a command line or CGI in a WS. 
+
+Examples: 
+
+get_metajson_v2.py q=remera
+
+http://hostname/cgi-bin/get_metajson_v2.py?q=remera
+
+It will return a JSON with Picture_id and Metadata
+ 
