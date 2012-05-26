@@ -22,7 +22,7 @@ def api_input ():
 def searchcall (search_data):
 	try:		
 		req_param =  'https://api.mercadolibre.com/sites/MLA/search?q=' + search_data
-		print req_param
+		#print req_param
 		r = requests.get(req_param)
 		content = json.loads(r.content)
 		data = content ["results"]

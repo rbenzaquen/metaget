@@ -8,5 +8,5 @@ get_metajson_v2.py q=remera
 
 http://hostname/cgi-bin/get_metajson_v2.py?q=remera
 
-It will return a JSON with Picture_id and Metadata
+It will return a JSON with Picture_id, Picture_URL  and Metadata
  
