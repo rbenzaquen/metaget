@@ -11,18 +11,38 @@ def api_input ():
 
 	# Get data from fields
 	q = form.getvalue('q')
+	category = form.getvalue('category')
+
 	try:
-		if len(q) > 2 :
+		if len(q) > 1:
+			return q   					#q search
+	except:
+		try:
+			if len(category) >3:   		#seems like a category search, let's verify it with categories API.
+				try:
+					req_param =  'https://api.mercadolibre.com/categories/' + category
+					print req_param
+					r = requests.get(req_param)
+					content = json.loads(r.content)
+					data = content ["message"]
+					q="False"
+					return q
+				except:
+					print "Valid Category"
+					category = "cat_" + category
+					return category			#Category search
+		except:
+			q="False"
 			return q
-	except:   							#if No parameters are passed Return q='False'
-		q = 'False'
-		return q
-	
 
 def searchcall (search_data):
 	try:		
-		req_param =  'https://api.mercadolibre.com/sites/MLA/search?q=' + search_data
-		#print req_param
+		if search_data[0:4] == 'cat_':			#Search category
+			search_data = search_data[4:]		#Removing de cat_
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?category=' + search_data
+		else:
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?q=' + search_data
+	
 		r = requests.get(req_param)
 		content = json.loads(r.content)
 		data = content ["results"]
@@ -73,8 +93,7 @@ def metadatacall (pictures):
 				results_list.append(copy.deepcopy(results))
 		except:
 			pass
-			
-	
+
 	return results_list
 
 
@@ -89,6 +108,7 @@ def exit_json ():
 	print 'No Data Received ...'
 	print 'Please use http://hostname/cgi-bin/json?q=somedata'
 
+	
 
 
 #Main Code
