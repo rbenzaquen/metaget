@@ -58,10 +58,6 @@ def itemscall (item_id):
 def metadatacall (pictures):
 	results = {}
 	results_list = []
-	jpicture_id = {}
-	jpicture_url = {}
-	jhistogram = {}
-	data = {}
 
 	for i in pictures:
 		req_param = 'https://api.mercadolibre.com/pictures/'+ i[0] + '/metadata'
@@ -71,12 +67,9 @@ def metadatacall (pictures):
 		
 		try:	
 			if content['histogram']:
-				data = {}
-				jpicture_id['picture_id'] = i[0]
-				jpicture_url['url'] = i[1]
-				jhistogram['histogram'] = content ["histogram"]
-				data = [jpicture_id, jpicture_url,jhistogram]
-				results['results'] = copy.deepcopy(data)
+				results ['picture_id'] = i[0]
+				results ['url'] = i[1]
+				results ['histogram'] = content ["histogram"]
 				results_list.append(copy.deepcopy(results))
 		except:
 			pass
