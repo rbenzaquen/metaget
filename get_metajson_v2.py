@@ -12,28 +12,29 @@ def api_input ():
 	# Get data from fields
 	q = form.getvalue('q')
 	category = form.getvalue('category')
-
+	color = form.getvalue('color')
 	try:
 		if len(q) > 1:
-			return q   					#q search
+			return q,color   					#q search
 	except:
 		try:
 			if len(category) >3:   		#seems like a category search, let's verify it with categories API.
 				try:
 					req_param =  'https://api.mercadolibre.com/categories/' + category
-					print req_param
+					#print req_param
 					r = requests.get(req_param)
 					content = json.loads(r.content)
 					data = content ["message"]
 					q="False"
-					return q
+					return q,color
 				except:
-					print "Valid Category"
+					#print "Valid Category"
 					category = "cat_" + category
-					return category			#Category search
+					return category,color		#Category search
 		except:
 			q="False"
-			return q
+			return q,color
+	
 
 def searchcall (search_data):
 	try:		
@@ -107,22 +108,51 @@ def exit_json ():
 	print
 	print 'No Data Received ...'
 	print 'Please use http://hostname/cgi-bin/json?q=somedata'
+	print 'http://hostname/cgi-bin/json?category=MLA1430'
+	print 'http://hostname/cgi-bin/json?q=somedata&color=RED'
 
-	
+
+def valid_color (color):
+	if color == 'BLACK' or color == 'GRAY' or color == 'TEAL' or color == 'RED' or color == 'BLUE'or color == 'WHITE' or color == 'GREEN' or color == 'PURPLE' or color == 'PINK':
+		#print 'valid color'
+		ok = 'TRUE'
+		return ok
+
+
+
+def match_color (metadata_list,color):
+	new_metadata_list = []
+
+	for i in metadata_list:
+		pred_color = i ['histogram'] [0] ['id']
+		if pred_color == color:
+			new_metadata_list.append(i)
+
+	return new_metadata_list		
+
 
 
 #Main Code
 
 q = api_input ()
-if q == "False":
+
+try:
+	color = q[1]					#Color
+	r = q[0]   						#Search value
+	if q[0] == "False":
+		exit_json ()
+	else:
+		items_id = searchcall (r)
+		pictures = itemscall (items_id)
+		metadata_list = metadatacall (pictures)
+
+		if valid_color (color) == 'TRUE':
+			new_metadata_list = match_color(metadata_list,color)
+			JsonBuild (new_metadata_list)
+		else:
+			JsonBuild (metadata_list)
+except:
 	exit_json ()
-else:	
-	items_id = searchcall (q)
-	pictures = itemscall (items_id)
-	metadata_list = metadatacall (pictures)
-	JsonBuild (metadata_list)
-
-
 
 
 
