@@ -40,9 +40,11 @@ def searchcall (search_data):
 	try:		
 		if search_data[0:4] == 'cat_':			#Search category
 			search_data = search_data[4:]		#Removing de cat_
-			req_param =  'https://api.mercadolibre.com/sites/MLA/search?category=' + search_data
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&category=' + search_data
+			#print req_param
 		else:
-			req_param =  'https://api.mercadolibre.com/sites/MLA/search?q=' + search_data
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&q=' + search_data
+			print req_param
 	
 		r = requests.get(req_param)
 		content = json.loads(r.content)
@@ -54,6 +56,28 @@ def searchcall (search_data):
 	except:
 		pass
 
+	return search_json				#return a list with Items_ID for the first page
+
+def searchcall2 (search_data):		
+	if search_data[0:4] == 'cat_':			#Search category
+		search_data = search_data[4:]		#Removing de cat_
+		req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&category=' + search_data
+		print req_param
+	else:
+		req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&q=' + search_data
+		print req_param
+	
+	r = requests.get(req_param)
+	content = json.loads(r.content)
+	data = content ["results"]
+		
+	search_json=[]
+	for i in data:
+		offset = i["thumbnail"].find("_f")
+		picture_id = 'MLA'+ i["thumbnail"] [offset+3:len(i["thumbnail"])-4]
+		items = i["id"],i["thumbnail"],picture_id
+		search_json.append(items)
+	
 	return search_json				#return a list with Items_ID for the first page
 
 def itemscall (item_id):
@@ -71,8 +95,10 @@ def itemscall (item_id):
 	r = requests.get(url)
 	content = json.loads(r.content)  #content has pictures_id for the search	
 									 #print content [2] ['pictures'] [0] ['id']
+	print content
 	for i in content:
 		data = [i ['pictures'] [0] ['id'],i ['pictures'] [0] ['url']]
+		print data
 		pictures.append(data)		#pictures([picture_id,picture_url)
 	return pictures
 
@@ -81,14 +107,12 @@ def metadatacall (pictures):
 	results_list = []
 
 	for i in pictures:
-		req_param = 'https://api.mercadolibre.com/pictures/'+ i[0] + '/metadata'
-		#print req_param
+		req_param = 'https://api.mercadolibre.com/pictures/'+ i[2] + '/metadata'
 		r = requests.get(req_param)
 		content = json.loads(r.content)
-		
 		try:	
 			if content['histogram']:
-				results ['picture_id'] = i[0]
+				results ['picture_id'] = i[2]
 				results ['url'] = i[1]
 				results ['histogram'] = content ["histogram"]
 				results_list.append(copy.deepcopy(results))
@@ -142,10 +166,10 @@ try:
 	if q[0] == "False":
 		exit_json ()
 	else:
-		items_id = searchcall (r)
-		pictures = itemscall (items_id)
-		metadata_list = metadatacall (pictures)
-
+		#items_id = searchcall (r)
+		items = searchcall2 (r)
+		#pictures = itemscall (items_id)
+		metadata_list = metadatacall (items)
 		if valid_color (color) == 'TRUE':
 			new_metadata_list = match_color(metadata_list,color)
 			JsonBuild (new_metadata_list)
