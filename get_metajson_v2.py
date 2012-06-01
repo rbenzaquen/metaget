@@ -158,25 +158,24 @@ def match_color (metadata_list,color):
 
 #Main Code
 
-q = api_input ()
-
+q = api_input ()											#Input
 try:
-	color = q[1]					#Color
-	r = q[0]   						#Search value
+	color = q[1]											#Color
+	r = q[0]   												#Search value or Category
 	if q[0] == "False":
 		exit_json ()
 	else:
-		#items_id = searchcall (r)
 		items = searchcall2 (r)
-		#pictures = itemscall (items_id)
 		metadata_list = metadatacall (items)
+		
 		if valid_color (color) == 'TRUE':
 			new_metadata_list = match_color(metadata_list,color)
-			JsonBuild (new_metadata_list)
+			JsonBuild (new_metadata_list)					#Build Metadata with Color-tag
 		else:
-			JsonBuild (metadata_list)
+			JsonBuild (metadata_list)						#Build Metadata only
 except:
-	exit_json ()
+	exit_json ()											#Going out
+
 
 
 
