@@ -11,3 +11,52 @@ http://hostname/cgi-bin/get_metajson_v2.py?category=MLA1430&color=RED
 
 It will return a JSON with Picture_id, Picture_URL  and Metadata
  
+Something like this...
+
+./get_metajson_v2.py 'q=remera&color=RED'
+
+
+[
+  {
+    "histogram": [
+      {
+        "id": "RED", 
+        "percent": "24", 
+        "rgb": "#CC0000"
+      }, 
+      {
+        "id": "PINK", 
+        "percent": "15", 
+        "rgb": "#FF98BF"
+      }, 
+      {
+        "id": "ORANGE", 
+        "percent": "15", 
+        "rgb": "#FB940B"
+      }
+    ], 
+    "picture_id": "MLA146015346_6286", 
+    "url": "http://img2.mlstatic.com/s_MLA_v_I_f_146015346_6286.jpg"
+  }, 
+  {
+    "histogram": [
+      {
+        "id": "RED", 
+        "percent": "9", 
+        "rgb": "#CC0000"
+      }, 
+      {
+        "id": "WHITE", 
+        "percent": "8", 
+        "rgb": "#FFFFFF"
+      }, 
+      {
+        "id": "BLACK", 
+        "percent": "8", 
+        "rgb": "#000000"
+      }
+    ], 
+    "picture_id": "MLA2658459002_052012", 
+    "url": "http://img1.mlstatic.com/s_MLA_v_I_f_2658459002_052012.jpg"
+  }, 
+

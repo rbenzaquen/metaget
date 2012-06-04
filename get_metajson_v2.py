@@ -6,6 +6,7 @@ import cgi, cgitb
 import copy
 
 class geti:
+	
 	def api_input(self):
 		# Create instance of FieldStorage 
 		form = cgi.FieldStorage() 
@@ -19,10 +20,9 @@ class geti:
 				return q,color   					#q search
 		except:
 			try:
-				if len(category) >3:   		#seems like a category search, let's verify it with categories API.
+				if len(category) >3:   				#seems like a category search, let's verify it with categories API.
 					try:
 						req_param =  'https://api.mercadolibre.com/categories/' + category
-						#print req_param
 						r = requests.get(req_param)
 						content = json.loads(r.content)
 						data = content ["message"]
@@ -90,8 +90,8 @@ class geti:
 		req_param = req_param[:-1]
 		url = base_url + req_param + '&attributes=pictures'
 		r = requests.get(url)
-		content = json.loads(r.content)  #content has pictures_id for the search	
-									 #print content [2] ['pictures'] [0] ['id']
+		content = json.loads(r.content)  	#content has pictures_id for the search	
+									 		#print content [2] ['pictures'] [0] ['id']
 		for i in content:
 			data = [i ['pictures'] [0] ['id'],i ['pictures'] [0] ['url']]
 			pictures.append(data)		#pictures([picture_id,picture_url)
@@ -158,8 +158,8 @@ if __name__ == "__main__":
 	q=getvalues.api_input()
 	
 try:
-	color = q[1]											#Color
-	r = q[0]   												#Search value or Category
+	color = q[1]													#Color
+	r = q[0]   														#Search value or Category
 	if q[0] == "False":
 		getvalues.exit_json ()
 	else:
