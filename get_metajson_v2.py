@@ -165,7 +165,6 @@ try:
 	else:
 		items = getvalues.searchcall2 (r)
 		metadata_list = getvalues.metadatacall (items)
-		getvalues.JsonBuild (metadata_list)	
 		if getvalues.valid_color (color) == 'TRUE':
 			new_metadata_list = getvalues.match_color(metadata_list,color)
 			getvalues.JsonBuild (new_metadata_list)					#Build Metadata with Color-tag
