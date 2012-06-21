@@ -61,9 +61,9 @@ class geti:
 	def searchcall2 (self,search_data):		
 		if search_data[0:4] == 'cat_':			#Search category
 			search_data = search_data[4:]		#Removing de cat_
-			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&category=' + search_data
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=50&category=' + search_data
 		else:
-			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=200&q=' + search_data
+			req_param =  'https://api.mercadolibre.com/sites/MLA/search?limit=50&q=' + search_data
 	
 		r = requests.get(req_param)
 		content = json.loads(r.content)
@@ -76,6 +76,7 @@ class geti:
 			search_json.append(items)
 			
 		return search_json				#return a list with Items_ID for the first page
+
 
 	def itemscall (self,item_id):
 		picture_id=[]
@@ -97,6 +98,8 @@ class geti:
 			pictures.append(data)		#pictures([picture_id,picture_url)
 		return pictures
 
+
+
 	def metadatacall (self,pictures):
 		results = {}
 		results_list = []
@@ -114,6 +117,22 @@ class geti:
 			except:
 				pass
 		return results_list
+
+	def realtime_call (self,items):
+		results = {}
+		results_list = []
+
+		for i in items:
+			req_param = 'http://imagefront.mercadolibre.com/picture/colors?pictureURL='+ i[1]
+			r = requests.get(req_param)
+			content = json.loads(r.content)
+			results ['picture_id'] = i[2]
+			results ['url'] = i[1]
+			results ['colors'] = content["colors"]
+			results_list.append(copy.deepcopy(results))
+		
+		return results_list
+
 
 
 	def JsonBuild (self,metadata_list):
@@ -164,11 +183,15 @@ try:
 		getvalues.exit_json ()
 	else:
 		items = getvalues.searchcall2 (r)
-		metadata_list = getvalues.metadatacall (items)
-		if getvalues.valid_color (color) == 'TRUE':
-			new_metadata_list = getvalues.match_color(metadata_list,color)
-			getvalues.JsonBuild (new_metadata_list)					#Build Metadata with Color-tag
-		else:
-			getvalues.JsonBuild (metadata_list)						#Build Metadata only
+		metadata_list = getvalues.realtime_call (items)
+		getvalues.JsonBuild (metadata_list)
+		
+		#metadata_list = getvalues.metadatacall (items)
+		
+		#if getvalues.valid_color (color) == 'TRUE':
+		#	new_metadata_list = getvalues.match_color(metadata_list,color)
+		#	getvalues.JsonBuild (new_metadata_list)					#Build Metadata with Color-tag
+		#else:
+		#	getvalues.JsonBuild (metadata_list)						#Build Metadata only
 except:
 	getvalues.exit_json()											#Going out
