@@ -5,6 +5,50 @@ import sys
 import cgi, cgitb
 import copy
 
+import urllib
+from threading import Thread
+from Queue import Queue
+
+NUM_WORKERS = 80
+
+class Dnld:
+    def __init__(self):
+        self.Q = Queue()
+        for i in xrange(NUM_WORKERS):
+            t = Thread(target=self.worker)
+            t.setDaemon(True)
+            t.start()
+
+    def worker(self):
+        while 1:
+            url, Q = self.Q.get()
+            try:
+                f = urllib.urlopen(url)
+                Q.put(('ok', url, f.read()))
+                f.close()
+            except Exception, e:
+                Q.put(('error', url, e))
+                try: f.close() # clean up
+                except: pass
+
+    def download_urls(self, L):
+        Q = Queue() # Create a second queue so the worker 
+                    # threads can send the data back again
+        for url in L:
+            # Add the URLs in `L` to be downloaded asynchronously
+            self.Q.put((url, Q))
+
+        rtn = []
+        for i in xrange(len(L)):
+            # Get the data as it arrives, raising 
+            # any exceptions if they occur
+            status, url, data = Q.get()
+            if status == 'ok':
+                rtn.append((url, data))
+            else:
+                raise data
+        return rtn
+
 class geti:
 	
 	def api_input(self):
@@ -119,21 +163,19 @@ class geti:
 		return results_list
 
 	def realtime_call (self,items):
+		inst = Dnld()
+		urls = []
+		cooked_results = []
 		results = {}
-		results_list = []
-
 		for i in items:
-			req_param = 'http://imagefront.mercadolibre.com/picture/colors?pictureURL='+ i[1]
-			r = requests.get(req_param)
-			content = json.loads(r.content)
-			results ['picture_id'] = i[2]
-			results ['url'] = i[1]
-			results ['colors'] = content["colors"]
-			results_list.append(copy.deepcopy(results))
+			urls.append('http://imagefront.mercadolibre.com/picture/colors?pictureURL='+i[1])
+		for url, data in inst.download_urls(urls):
+    			results ['url'] = url
+    			data1 = json.loads(data)
+    			results ['colors'] = data1 ["colors"]
+    			cooked_results.append(copy.deepcopy(results))
+    		return cooked_results
 		
-		return results_list
-
-
 
 	def JsonBuild (self,metadata_list):
 		print 'Content-Type: application/json'  
@@ -176,7 +218,7 @@ if __name__ == "__main__":
 	getvalues = geti()
 	q=getvalues.api_input()
 	
-try:
+#try:
 	color = q[1]													#Color
 	r = q[0]   														#Search value or Category
 	if q[0] == "False":
@@ -193,5 +235,5 @@ try:
 		#	getvalues.JsonBuild (new_metadata_list)					#Build Metadata with Color-tag
 		#else:
 		#	getvalues.JsonBuild (metadata_list)						#Build Metadata only
-except:
-	getvalues.exit_json()											#Going out
+#except:
+	#getvalues.exit_json()											#Going out
