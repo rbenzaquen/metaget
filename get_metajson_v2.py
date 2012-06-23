@@ -170,7 +170,8 @@ class geti:
 		for i in items:
 			urls.append('http://imagefront.mercadolibre.com/picture/colors?pictureURL='+i[1])
 		for url, data in inst.download_urls(urls):
-    			results ['url'] = url
+    			offset = url.find("URL=")
+    			results ['url'] = url[offset+4:]
     			data1 = json.loads(data)
     			results ['colors'] = data1 ["colors"]
     			cooked_results.append(copy.deepcopy(results))
